@@ -1,0 +1,164 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: asciidoctor-s2i
+  labels:
+    template: asciidoctor-s2i
+  annotations:
+    description: >-
+      An asciidoctor s2i builder. All files named *.adoc will be converted.
+      you need a file index.adoc as central page.
+    iconClass: icon-nginx
+    openshift.io/display-name: AsciiDoctor S2I Builder
+    openshift.io/documentation-url: 'https://github.com/klenkes74/openshift-asciidoctor'
+    openshift.io/long-description: >-
+      This image is an S2I builder running on top of the centos nginx image.
+    openshift.io/provider-display-name: 'Kaiserpfalz EDV-Service, Roland T. Lichti'
+    openshift.io/support-url: 'https://www.kaiserpfalz-edv.de'
+    tags: 'nginx,builder,cms'
+    template.openshift.io/bindable: 'false'
+parameters:
+- name: ASCIIDOCTOR_VERSION
+  displayName: Version (ASCIIDOCTOR)
+  description: The version of asciidoctor used.
+  required: true
+  value: '2.0.9'
+- name: ASCIIDOCTOR_CONFLUENCE_VERSION
+  displayName: Version (ASCIIDOCTOR Confluence)
+  description: The version of the confluence plugin for asciidoctor.
+  required: true
+  value: '0.0.2'
+- name: ASCIIDOCTOR__VERSION
+  displayName: Version (ASCIIDOCTOR PDF)
+  description: The version of the PDF plugin for asciidoctor.
+  required: true
+  value: '1.5.0.alpha.17'
+- name: ASCIIDOCTOR_DIAGRAM_VERSION
+  displayName: Version (ASCIIDOCTOR Diagram)
+  description: The version of the diagram plugin for asciidoctor.
+  required: true
+  value: '1.5.16'
+- name: ASCIIDOCTOR_EPUB3_VERSION
+  displayName: Version (EPUB3 Plugin)
+  description: The version for the EPUB3 plugin for asciidoctor
+  required: true
+  value: '1.5.0.alpha.9'
+- name: ASCIIDOCTOR_MATHEMATICAL_VERSION
+  displayName: Version (Mathematical Plugin)
+  description: The version of the math plugin for asciidoctor.
+  required: true
+  value: '0.3.0'
+- name: ASCIIDOCTOR_REVEALJS_VERSION
+  displayName: Version (RevealJS Plugin)
+  description: The version of the RevealJS plugin for asciidoctor.
+  required: true
+  value: '2.0.0'
+- name: GITHUB_SECRET
+  displayName: GitHub WebHook Secret
+  description: The BASE64 encoded GitHub WebHook Secret
+  required: true
+  value: dGExdmFpZjhob3AwbmVpOEhlZTU=
+objects:
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    annotations:
+      description: The ASCIIDOC builder based on s2i
+      template.alpha.openshift.io/wait-for-ready: 'true'
+    labels:
+      template: asciidoctor-s2i
+      delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+  spec:
+    completionDeadlineSeconds: 600
+    failedBuildsHistoryLimit: 1
+    output:
+      imageLabels:
+        - name: io.k8s.display-name
+          value: ASCIIdoc S2I Builder
+        - name: io.k8s.description
+          value: >-
+            The ASCIIDOC S2I Builder (based on nginx on centos)
+        - name: io.openshift.s2i.scripts-url
+          value: 'image:///usr/libexec/s2i'
+        - name: io.s2i.scripts-url
+          value: 'image:///usr/libexec/s2i'
+        - name: io.openshift.tags
+          value: 'builder,asciidoc,nginx'
+        - name: template
+          value: asciidoc-s2i
+        - name: io.openshift.expose-services
+          value: '8080:http'
+      to:
+        kind: ImageStreamTag
+        name: 'asciidoctor-s2i:${ASCIIDOCTOR_VERSION}'
+    resources:
+      limits:
+        cpu: 250m
+        memory: 128Mi
+    runPolicy: Serial
+    source:
+      git:
+        ref: master
+        uri: 'https://github.com/klenkes74/openshift-asciidoctor.git'
+      type: Git
+    env:
+    - name: ASCIIDOCTOR_VERSION
+      value: "${ASCIIDOCTOR_VERSION}"
+    - name: ASCIIDOCTOR_CONFLUENCE_VERSION
+      value: "${ASCIIDOCTOR_CONFLUENCE_VERSION}"
+    - name: asciidoctor_pdf_version
+      value: "${ASCIIDOCTOR_PDF_VERSION}"
+    - name: ASCIIDOCTOR_DIAGRAM_VERSION
+      value: "${ASCIIDOCTOR_DIAGRAM_VERSION}"
+    - name: ASCIIDOCTOR_EPUB3_VERSION
+      value: "${ASCIIDOCTOR_EPUB3_VERSION}"
+    - name: ASCIIDOCTOR_MATHEMATICAL_VERSION
+      value: "${ASCIIDOCTOR_MATHEMATICAL_VERSION}"
+    - name: ASCIIDOCTOR_REVEALJS_VERSION
+      value: "${ASCIIDOCTOR_REVEALJS_VERSION}"
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: 'nginx:1.12'
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 2
+    triggers:
+      - imageChange:
+        type: ImageChange
+      - type: ConfigChange
+      - type: GitHub
+        github:
+          secretReference:
+            name: asciidoctor-s2i
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    labels:
+      template: asciidoctor-s2i
+      delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+  spec:
+    lookupPolicy:
+      local: true
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+    labels:
+      template: asciidoctor-s2i
+      delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+  type: Opaque
+  data:
+    WebHookSecretKey: ${GITHUB_SECRET}
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    labels:
+      template: asciidoctor-s2i
+    name: asciidoctor-s2i
+  spec:
+    lookupPolicy:
+      local: true
