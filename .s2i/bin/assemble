@@ -2,7 +2,7 @@
 
 cd /tmp/src
 
-yum install -y \
+sudo yum install -y \
 	bash curl ca-certificates make java-1.8.0-openjdk-headless \
 	findutils inotify-tools \
 	ruby ruby-devel \
@@ -11,9 +11,9 @@ yum install -y \
 	python-pillow python-pillow-devel \
 	libxml2-devel 
 
-yum clean all -y
+sudo yum clean all -y
 
-gem install --no-document \
+sudo gem install --no-document \
 	"asciidoctor:${ASCIIDOCTOR_VERSION}" \
 	"asciidoctor-confluence:${ASCIIDOCTOR_CONFLUENCE_VERSION}" \
 	"asciidoctor-diagram:${ASCIIDOCTOR_DIAGRAM_VERSION}" \
@@ -33,8 +33,8 @@ gem install --no-document \
 	thread_safe \
 	tilt
 	
-pip install --upgrade pip
-pip install --no-cache-dir \
+sudo pip install --upgrade pip
+sudo pip install --no-cache-dir \
 	actdiag \
 	'blockdiag[pdf]' \
 	nwdiag \
