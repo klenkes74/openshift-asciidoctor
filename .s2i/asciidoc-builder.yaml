@@ -1,0 +1,54 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    description: The ASCIIDOC builder based on s2i
+    template.alpha.openshift.io/wait-for-ready: 'true'
+  labels:
+    template: asciidoc-s2i
+  name: asciidoc-s2i
+spec:
+  completionDeadlineSeconds: 600
+  failedBuildsHistoryLimit: 1
+  output:
+    imageLabels:
+      - name: io.k8s.display-name
+        value: ASCIIdoc S2I Builder
+      - name: io.k8s.description
+        value: >-
+          The ASCIIDOC S2I Builder (based on nginx on centos)
+      - name: io.openshift.s2i.scripts-url
+        value: 'image:///usr/libexec/s2i'
+      - name: io.s2i.scripts-url
+        value: 'image:///usr/libexec/s2i'
+      - name: io.openshift.tags
+        value: 'builder,asciidoc,nginx'
+      - name: template
+        value: asciidoc-s2i
+      - name: io.openshift.expose-services
+        value: '8080:http'
+    to:
+      kind: ImageStreamTag
+      name: 'asciidoc-s2i:${ASCIIDOC_VERSION}'
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: 'https://github.com/klenkes74/openshift-asciidoc.git'
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: 'nginx:112'
+        namespace: openshift
+    type: Source
+  successfulBuildsHistoryLimit: 2
+  triggers:
+    - imageChange:
+      type: ImageChange
+    - type: ConfigChange

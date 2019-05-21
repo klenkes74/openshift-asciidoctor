@@ -1,0 +1,57 @@
+#!/bin/bash
+
+cd /tmp/src
+
+yum install -y \
+	bash curl ca-certificates make java-1.8.0-openjdk-headless \
+	findutils inotify-tools \
+	ruby ruby-devel \
+	baekmuk-ttf-fonts-common \
+	graphviz-ruby graphviz-devel graphviz python2-pygraphviz python2-pydot \
+	python-pillow python-pillow-devel \
+	libxml2-devel 
+
+gem install --no-document \
+	"asciidoctor:${ASCIIDOCTOR_VERSION}" \
+	"asciidoctor-confluence:${ASCIIDOCTOR_CONFLUENCE_VERSION}" \
+	"asciidoctor-diagram:${ASCIIDOCTOR_DIAGRAM_VERSION}" \
+	"asciidoctor-epub3:${ASCIIDOCTOR_EPUB3_VERSION}" \
+	"asciidoctor-mathematical:${ASCIIDOCTOR_MATHEMATICAL_VERSION}" \
+	asciimath \
+	"asciidoctor-pdf:${ASCIIDOCTOR_PDF_VERSION}" \
+	"asciidoctor-revealjs:${ASCIIDOCTOR_REVEALJS_VERSION}" \
+	coderay \
+	epubcheck:3.0.1 \
+	haml \
+	kindlegen:3.0.3 \
+	pygments.rb \
+	rake \
+	rouge \
+	slim \
+	thread_safe \
+	tilt
+	
+pip install --upgrade pip
+pip install --no-cache-dir \
+	actdiag \
+	'blockdiag[pdf]' \
+	nwdiag \
+	Pygments \
+	seqdiag
+	
+
+if [ !  -f index.adoc ] ; then
+	echo "===================================================="
+	echo "   No index.adoc!!!!"
+	echo "===================================================="
+	exit 1
+fi
+
+for adoc in `find . -iname "*.adoc"` ; do
+	echo "---> Converting: ${adoc} ..."
+	asciidoctor "${adoc}"
+	rm "${adoc}"
+done
+
+# Chain the original build script
+exec /usr/libexec/s2i/assemble
