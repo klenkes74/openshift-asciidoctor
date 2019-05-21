@@ -1,9 +1,0 @@
-apiVersion: image.openshift.io/v1
-kind: ImageStream
-metadata:
-  labels:
-    template: asciidoctor-s2i
-  name: asciidoctor-s2i
-spec:
-  lookupPolicy:
-    local: true
