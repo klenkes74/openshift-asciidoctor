@@ -5,8 +5,8 @@ metadata:
     description: The ASCIIDOC builder based on s2i
     template.alpha.openshift.io/wait-for-ready: 'true'
   labels:
-    template: asciidoc-s2i
-  name: asciidoc-s2i
+    template: asciidoctor-s2i
+  name: asciidoctor-s2i
 spec:
   completionDeadlineSeconds: 600
   failedBuildsHistoryLimit: 1
@@ -29,7 +29,7 @@ spec:
         value: '8080:http'
     to:
       kind: ImageStreamTag
-      name: 'asciidoc-s2i:${ASCIIDOC_VERSION}'
+      name: 'asciidoctor-s2i:2.0.9'
   resources:
     limits:
       cpu: 250m
@@ -38,13 +38,28 @@ spec:
   source:
     git:
       ref: master
-      uri: 'https://github.com/klenkes74/openshift-asciidoc.git'
+      uri: 'https://github.com/klenkes74/openshift-asciidoctor.git'
     type: Git
+  env:
+  - name: ASCIIDOCTOR_VERSION
+    value: '2.0.9'
+  - name: ASCIIDOCTOR_CONFLUENCE_VERSION
+    value: '0.0.2'
+  - name: asciidoctor_pdf_version
+    value: '1.5.0.alpha.17'
+  - name: asciidoctor_diagram_version
+    value: '1.5.16'
+  - name: asciidoctor_epub3_version
+    value: '1.5.0.alpha.9'
+  - name: asciidoctor_mathematical_version
+    value: '0.3.0'
+  - name: asciidoctor_revealjs_version
+    value: '2.0.0'
   strategy:
     sourceStrategy:
       from:
         kind: ImageStreamTag
-        name: 'nginx:112'
+        name: 'nginx:1.12'
         namespace: openshift
     type: Source
   successfulBuildsHistoryLimit: 2

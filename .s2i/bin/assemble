@@ -11,6 +11,8 @@ yum install -y \
 	python-pillow python-pillow-devel \
 	libxml2-devel 
 
+yum clean all -y
+
 gem install --no-document \
 	"asciidoctor:${ASCIIDOCTOR_VERSION}" \
 	"asciidoctor-confluence:${ASCIIDOCTOR_CONFLUENCE_VERSION}" \
