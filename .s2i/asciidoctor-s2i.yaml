@@ -28,7 +28,7 @@ parameters:
   description: The version of the confluence plugin for asciidoctor.
   required: true
   value: '0.0.2'
-- name: ASCIIDOCTOR__VERSION
+- name: ASCIIDOCTOR_VERSION
   displayName: Version (ASCIIDOCTOR PDF)
   description: The version of the PDF plugin for asciidoctor.
   required: true
