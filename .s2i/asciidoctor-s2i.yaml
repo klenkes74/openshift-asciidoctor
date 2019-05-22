@@ -59,6 +59,91 @@ parameters:
   required: true
   value: dGExdmFpZjhob3AwbmVpOEhlZTU=
 objects:
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    labels:
+      template: asciidoctor-s2i
+      build: nginx-asciidoctor-base
+      delete: asciidoctor-s2i
+    name: nginx-asciidoctor-base
+  spec:
+    lookupPolicy:
+      local: true
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    labels:
+      build: nginx-asciidoctor-base
+      template: asciidoctor-s2i
+      delete: asciidoctor-s2i-${ASCIIDCOTOR_VERSION}
+    name: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
+  spec:
+    failedBuildsHistoryLimit: 1
+    successfulBuildsHistoryLimit: 3
+    resources:
+      limits:
+        cpu: 250m
+        memory: 128Mi
+    runPolicy: Serial
+    source:
+      dockerfile: "FROM openshift/nginx:1.12\n\n# RHSCL rh-nginx112 image.\n#\n# Volumes:\n#
+        \ * /var/opt/rh/rh-nginx112/log/nginx/ - Storage for logs\n\nEXPOSE 8080\nEXPOSE
+        8443\n\nENV SUMMARY=\"Platform for running nginx $NGINX_VERSION or building
+        nginx-based application\" \\\n    DESCRIPTION=\"Nginx is a web server and a
+        reverse proxy server for HTTP, SMTP, POP3 and IMAP \\\nprotocols, with a strong
+        focus on high concurrency, performance and low memory usage. The container \\\nimage
+        provides a containerized packaging of the nginx $NGINX_VERSION daemon. The image
+        can be used \\\nas a base image for other applications based on nginx $NGINX_VERSION
+        web server. \\\nNginx server image can be extended using source-to-image tool.\"\n\nRUN
+        yum\nRUN yum install -y \\\n\tbash curl ca-certificates make java-1.8.0-openjdk-headless
+        \\\n\tfindutils inotify-tools \\\n\truby ruby-devel \\\n\tbaekmuk-ttf-fonts-common
+        \\\n\tgraphviz-ruby graphviz-devel graphviz python2-pygraphviz python2-pydot
+        \\\n\tpython-pillow python-pillow-devel \\\n\tlibxml2-devel && yum clean all
+        -y\n\nRUN gem install --no-document \\\n\t\"asciidoctor:${ASCIIDOCTOR_VERSION}\"
+        \\\n\t\"asciidoctor-confluence:${ASCIIDOCTOR_CONFLUENCE_VERSION}\" \\\n\t\"asciidoctor-diagram:${ASCIIDOCTOR_DIAGRAM_VERSION}\"
+        \\\n\t\"asciidoctor-epub3:${ASCIIDOCTOR_EPUB3_VERSION}\" \\\n\t\"asciidoctor-mathematical:${ASCIIDOCTOR_MATHEMATICAL_VERSION}\"
+        \\\n\tasciimath \\\n\t\"asciidoctor-pdf:${ASCIIDOCTOR_PDF_VERSION}\" \\\n\t\"asciidoctor-revealjs:${ASCIIDOCTOR_REVEALJS_VERSION}\"
+        \\\n\tcoderay \\\n\tepubcheck:3.0.1 \\\n\thaml \\\n\tkindlegen:3.0.3 \\\n\tpygments.rb
+        \\\n\trake \\\n\trouge \\\n\tslim \\\n\tthread_safe \\\n\ttilt\n\t\nRUN pip
+        install --upgrade pip && pip install --no-cache-dir \\\n\tactdiag \\\n\t'blockdiag[pdf]'
+        \\\n\tnwdiag \\\n\tPygments \\\n\tseqdiag\n\t\nUSER 1001\n\nCMD /usr/libexec/s2i/usage\n"
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        env:
+        - name: ASCIIDOCTOR_VERSION
+          value: "${ASCIIDOCTOR_VERSION}"
+        - name: ASCIIDOCTOR_CONFLUENCE_VERSION
+          value: "${ASCIIDOCTOR_CONFLUENCE_VERSION}"
+        - name: asciidoctor_pdf_version
+          value: "${ASCIIDOCTOR_PDF_VERSION}"
+        - name: ASCIIDOCTOR_DIAGRAM_VERSION
+          value: "${ASCIIDOCTOR_DIAGRAM_VERSION}"
+        - name: ASCIIDOCTOR_EPUB3_VERSION
+          value: "${ASCIIDOCTOR_EPUB3_VERSION}"
+        - name: ASCIIDOCTOR_MATHEMATICAL_VERSION
+          value: "${ASCIIDOCTOR_MATHEMATICAL_VERSION}"
+        - name: ASCIIDOCTOR_REVEALJS_VERSION
+          value: "${ASCIIDOCTOR_REVEALJS_VERSION}"
+        from:
+          kind: ImageStreamTag
+          name: nginx:1.12
+          namespace: openshift
+      type: Docker
+    output:
+      to:
+        kind: ImageStreamTag
+        name: 'nginx-asciidoctor-base:${ASCIIDOCTOR_VERSION}'
+    triggers:
+    - github:
+        secretReference:
+          name: github
+      type: GitHub
+    - type: ConfigChange
+    - imageChange:
+        lastTriggeredImageID: docker-registry.default.svc:5000/openshift/nginx@sha256:e24f944339b6cd48ba74f6950d2e32e003c156d4e701ad4f4e5b3b7ac6b73230
+      type: ImageChange
 - kind: BuildConfig
   apiVersion: build.openshift.io/v1
   metadata:
@@ -102,21 +187,6 @@ objects:
         ref: master
         uri: 'https://github.com/klenkes74/openshift-asciidoctor.git'
       type: Git
-    env:
-    - name: ASCIIDOCTOR_VERSION
-      value: "${ASCIIDOCTOR_VERSION}"
-    - name: ASCIIDOCTOR_CONFLUENCE_VERSION
-      value: "${ASCIIDOCTOR_CONFLUENCE_VERSION}"
-    - name: asciidoctor_pdf_version
-      value: "${ASCIIDOCTOR_PDF_VERSION}"
-    - name: ASCIIDOCTOR_DIAGRAM_VERSION
-      value: "${ASCIIDOCTOR_DIAGRAM_VERSION}"
-    - name: ASCIIDOCTOR_EPUB3_VERSION
-      value: "${ASCIIDOCTOR_EPUB3_VERSION}"
-    - name: ASCIIDOCTOR_MATHEMATICAL_VERSION
-      value: "${ASCIIDOCTOR_MATHEMATICAL_VERSION}"
-    - name: ASCIIDOCTOR_REVEALJS_VERSION
-      value: "${ASCIIDOCTOR_REVEALJS_VERSION}"
     strategy:
       sourceStrategy:
         from:
