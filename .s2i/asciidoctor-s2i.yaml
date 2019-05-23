@@ -161,8 +161,8 @@ objects:
         name: 'asciidoctor-s2i:${ASCIIDOCTOR_VERSION}'
     resources:
       limits:
-        cpu: 250m
-        memory: 128Mi
+        cpu: 2000m
+        memory: 2Gi
     runPolicy: Serial
     source:
       git:
