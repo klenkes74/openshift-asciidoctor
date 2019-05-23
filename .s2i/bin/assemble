@@ -11,7 +11,7 @@ fi
 
 for adoc in `find . -iname "*.adoc"` ; do
 	echo "---> Converting: ${adoc} ..."
-	asciidoctor "${adoc}"
+	scl enable python27 scl enable rh-ruby23 "asciidoctor \"${adoc}\""
 	rm "${adoc}"
 done
 
