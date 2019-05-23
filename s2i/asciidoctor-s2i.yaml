@@ -90,7 +90,7 @@ objects:
       git:
         uri: "https://github.com/klenkes74/openshift-asciidoctor.git"
         ref: "master"
-      contextDir: ".s2i"
+      contextDir: "s2i"
     strategy:
       dockerStrategy:
         env:
