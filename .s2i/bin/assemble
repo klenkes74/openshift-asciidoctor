@@ -16,4 +16,4 @@ for adoc in `find . -iname "*.adoc"` ; do
 done
 
 # Chain the original build script
-exec /usr/libexec/s2i/assemble
+exec /usr/libexec/s2i/assemble-nginx
