@@ -11,7 +11,7 @@ RUN scl enable rh-ruby23 "gem install --no-document asciidoctor:${ASCIIDOCTOR_VE
 
 RUN scl enable python27 "pip install --upgrade pip" && scl enable python27 "pip install --no-cache-dir actdiag blockdiag[pdf] nwdiag Pygments seqdiag"
 
-RUN ls . /tmp/src
+RUN pwd
 
 RUN mv /usr/libexec/s2i/assemble /usr/libexec/s2i/assemble-nginx && cp /tmp/src/.s2i/bin/assemble /usr/libexec/s2i/assemble
 
