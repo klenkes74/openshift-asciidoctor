@@ -74,7 +74,7 @@ objects:
   apiVersion: build.openshift.io/v1
   metadata:
     labels:
-      build: nginx-asciidoctor-base-${ASCIIOCTOR_VERSION}
+      build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
       template: asciidoctor-s2i
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     name: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
@@ -116,7 +116,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: 'nginx-asciidoctor-base:${ASCIIDOCTOR_VERSION}'
+        name: "nginx-asciidoctor-base:${ASCIIDOCTOR_VERSION}"
     triggers:
     - type: GitHub
       github:
@@ -131,7 +131,7 @@ objects:
   metadata:
     labels:
       template: asciidoctor-s2i
-      build: nginx-asciidoctor-base-${ASCIIOCTOR_VERSION}
+      build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   spec:
@@ -143,7 +143,7 @@ objects:
     name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     labels:
       template: asciidoctor-s2i
-      build: nginx-asciidoctor-base-${ASCIIOCTOR_VERSION}
+      build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   type: Opaque
   data:
