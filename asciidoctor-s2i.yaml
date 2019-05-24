@@ -74,7 +74,7 @@ objects:
   apiVersion: build.openshift.io/v1
   metadata:
     labels:
-      build: nginx-asciidoctor-base
+      build: nginx-asciidoctor-base-${ASCIIOCTOR_VERSION}
       template: asciidoctor-s2i
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     name: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
@@ -90,7 +90,7 @@ objects:
       git:
         uri: "https://github.com/klenkes74/openshift-asciidoctor.git"
         ref: "master"
-      contextDir: "s2i"
+      contextDir: "asciidoctor-s2i"
     strategy:
       dockerStrategy:
         env:
@@ -121,71 +121,17 @@ objects:
     - type: GitHub
       github:
         secretReference:
-          name: asciidoctor-s2i
+          name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     - type: ConfigChange
     - imageChange:
         lastTriggeredImageID: docker-registry.default.svc:5000/openshift/nginx@sha256:e24f944339b6cd48ba74f6950d2e32e003c156d4e701ad4f4e5b3b7ac6b73230
       type: ImageChange
-- kind: BuildConfig
-  apiVersion: build.openshift.io/v1
-  metadata:
-    annotations:
-      description: The ASCIIDOC builder based on s2i
-      template.alpha.openshift.io/wait-for-ready: 'true'
-    labels:
-      template: asciidoctor-s2i
-      delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
-    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
-  spec:
-    completionDeadlineSeconds: 600
-    failedBuildsHistoryLimit: 1
-    output:
-      imageLabels:
-        - name: io.k8s.display-name
-          value: ASCIIdoc S2I Builder
-        - name: io.k8s.description
-          value: >-
-            The ASCIIDOC S2I Builder (based on nginx on centos)
-        - name: io.openshift.s2i.scripts-url
-          value: 'image:///usr/libexec/s2i'
-        - name: io.s2i.scripts-url
-          value: 'image:///usr/libexec/s2i'
-        - name: io.openshift.tags
-          value: 'builder,asciidoc,nginx'
-        - name: template
-          value: asciidoc-s2i
-        - name: io.openshift.expose-services
-          value: '8080:http'
-      to:
-        kind: ImageStreamTag
-        name: 'asciidoctor-s2i:${ASCIIDOCTOR_VERSION}'
-    resources:
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-    runPolicy: Serial
-    source:
-      git:
-        ref: master
-        uri: 'https://github.com/klenkes74/openshift-asciidoctor.git'
-      type: Git
-    strategy:
-      sourceStrategy:
-        from:
-          kind: ImageStreamTag
-          name: 'nginx-asciidoctor-base:${ASCIIDOCTOR_VERSION}'
-          namespace: dev-images
-      type: Source
-    successfulBuildsHistoryLimit: 2
-    triggers:
-      - imageChange:
-        type: ImageChange
-      - type: ConfigChange
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
   metadata:
     labels:
       template: asciidoctor-s2i
+      build: nginx-asciidoctor-base-${ASCIIOCTOR_VERSION}
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   spec:
@@ -197,16 +143,8 @@ objects:
     name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     labels:
       template: asciidoctor-s2i
+      build: nginx-asciidoctor-base-${ASCIIOCTOR_VERSION}
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   type: Opaque
   data:
     WebHookSecretKey: ${GITHUB_SECRET}
-- kind: ImageStream
-  apiVersion: image.openshift.io/v1
-  metadata:
-    labels:
-      template: asciidoctor-s2i
-    name: asciidoctor-s2i
-  spec:
-    lookupPolicy:
-      local: true

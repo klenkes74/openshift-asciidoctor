@@ -1,0 +1,111 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: docpod
+  labels:
+    template: docpod
+  annotations:
+    description: >-
+      An asciidoctor documentation pod.
+    iconClass: icon-nginx
+    openshift.io/display-name: AsciiDoctor docpod
+    openshift.io/documentation-url: 'https://github.com/klenkes74/openshift-asciidoctor'
+    openshift.io/long-description: >-
+      This image is an S2I builder running on top of the centos nginx image.
+    openshift.io/provider-display-name: 'Kaiserpfalz EDV-Service, Roland T. Lichti'
+    openshift.io/support-url: 'https://www.kaiserpfalz-edv.de'
+    tags: 'nginx,builder,cms'
+    template.openshift.io/bindable: 'false'
+parameters:
+- name: APPLICATION_NAME
+  displayName: Application Name
+  description: The name of the application the docu is generated for.
+  required: true
+  value: docpod
+- name: ASCIIDOCTOR_VERSION
+  displayName: Version (ASCIIDOCTOR)
+  description: The version of asciidoctor used.
+  required: true
+  value: '2.0.9'
+- name: GITHUB_SECRET
+  displayName: GitHub WebHook Secret
+  description: The BASE64 encoded GitHub WebHook Secret
+  required: true
+  value: dGExdmFpZjhob3AwbmVpOEhlZTU=
+objects:
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    annotations:
+      description: The documentation of 
+      template.alpha.openshift.io/wait-for-ready: 'true'
+    labels:
+      temlate: docpod
+      delete: docpod-${APPLICATION_NAME}
+    name: docpod-${APPLICATION_NAME}
+  spec:
+    completionDeadlineSeconds: 600
+    failedBuildsHistoryLimit: 1
+    output:
+      imageLabels:
+        - name: io.k8s.display-name
+          value: ASCIIdoc docpod
+        - name: io.k8s.description
+          value: >-
+            The docpod containing the documentation for project ${APPLICATION_NAME}
+        - name: io.openshift.s2i.scripts-url
+          value: 'image:///usr/libexec/s2i'
+        - name: io.s2i.scripts-url
+          value: 'image:///usr/libexec/s2i'
+        - name: io.openshift.tags
+          value: 'builder,asciidoc,nginx'
+        - name: template
+          value: docpod
+        - name: io.openshift.expose-services
+          value: '8080:http'
+      to:
+        kind: ImageStreamTag
+        name: 'docpod-${APPLICATION_NAME}:latest'
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+    runPolicy: Serial
+    source:
+      git:
+        ref: master
+        uri: 'https://github.com/klenkes74/openshift-asciidoctor.git'
+        contextDir: documentation
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: 'nginx-asciidoctor-base:${ASCIIDOCTOR_VERSION}'
+          namespace: dev-images
+      type: Source
+    successfulBuildsHistoryLimit: 2
+    triggers:
+      - imageChange:
+        type: ImageChange
+      - type: ConfigChange
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    labels:
+      temlate: docpod
+      delete: docpod-${APPLICATION_NAME}
+    name: docpod-${APPLICATION_NAME}
+  spec:
+    lookupPolicy:
+      local: true
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: docpod-${APPLICATION_NAME}
+    labels:
+      temlate: docpod
+      delete: docpod-${APPLICATION_NAME}
+  type: Opaque
+  data:
+    WebHookSecretKey: ${GITHUB_SECRET}

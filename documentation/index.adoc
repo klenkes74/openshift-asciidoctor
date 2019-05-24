@@ -1,0 +1,8 @@
+AsciiDoc S2I Build
+==================
+
+ Abstract
+ --------
+ This is a podified asciidoc generator. it takes a git repository (or parts thereof)
+ and genertes a documentation pod with static HTML from the contents.
+
