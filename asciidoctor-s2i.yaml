@@ -59,17 +59,6 @@ parameters:
   required: true
   value: dGExdmFpZjhob3AwbmVpOEhlZTU=
 objects:
-- kind: ImageStream
-  apiVersion: image.openshift.io/v1
-  metadata:
-    labels:
-      template: asciidoctor-s2i
-      build: nginx-asciidoctor-base
-      delete: asciidoctor-s2i
-    name: nginx-asciidoctor-base
-  spec:
-    lookupPolicy:
-      local: true
 - kind: BuildConfig
   apiVersion: build.openshift.io/v1
   metadata:
