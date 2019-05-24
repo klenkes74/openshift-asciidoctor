@@ -105,7 +105,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: "nginx-asciidoctor-base:${ASCIIDOCTOR_VERSION}"
+        name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:latest"
     triggers:
     - type: GitHub
       github:
