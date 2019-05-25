@@ -22,6 +22,10 @@ parameters:
   description: The name of the application the docu is generated for.
   required: true
   value: docpod
+- name: APPLICATION_URL
+  displayName: URL for the documentation
+  description: The URL for publishing the documentation
+  required: false
 - name: ASCIIDOCTOR_VERSION
   displayName: Version (ASCIIDOCTOR)
   description: The version of asciidoctor used.
@@ -41,8 +45,8 @@ objects:
       template.alpha.openshift.io/wait-for-ready: 'true'
     labels:
       temlate: docpod
-      delete: docpod-${APPLICATION_NAME}
-    name: docpod-${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
+    name: ${APPLICATION_NAME}-docpod
   spec:
     completionDeadlineSeconds: 600
     failedBuildsHistoryLimit: 1
@@ -65,11 +69,14 @@ objects:
           value: '8080:http'
       to:
         kind: ImageStreamTag
-        name: 'docpod-${APPLICATION_NAME}:latest'
+        name: "${APPLICATION_NAME}-docpod:latest"
     resources:
       limits:
         cpu: 2000m
         memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
     runPolicy: Serial
     source:
       git:
@@ -81,7 +88,7 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: 'nginx-asciidoctor-base:${ASCIIDOCTOR_VERSION}'
+          name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:latest"
           namespace: dev-images
       type: Source
     successfulBuildsHistoryLimit: 2
@@ -94,18 +101,141 @@ objects:
   metadata:
     labels:
       temlate: docpod
-      delete: docpod-${APPLICATION_NAME}
-    name: docpod-${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
+    name: ${APPLICATION_NAME}-docpod
   spec:
     lookupPolicy:
       local: true
 - kind: Secret
   apiVersion: v1
   metadata:
-    name: docpod-${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-docpod
     labels:
       temlate: docpod
-      delete: docpod-${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
+      delete: ${APPLICATION_NAME}
   type: Opaque
   data:
     WebHookSecretKey: ${GITHUB_SECRET}
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
+  metadata:
+    name: ${APPLICATION_NAME}-docpod
+    labels:
+      template: docpod
+      app: ${APPLICATION_NAME}
+      delete: "${APPLICATION_NAME}-docpod"
+      delete: ${APPLICATION_NAME}
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      app: "${APPLICATION_NAME}"
+      deploymentConfig: "${APPLICATION_NAME}-docpod"
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - wordpress
+          from:
+            kind: ImageStreamTag
+            name: "${APPLICATION_NAME}-docpod:latest"
+    template:
+      metadata:
+        labels:
+          app: "${APPLICATION_NAME}"
+          deploymentConfig: "${APPLICATION_NAME}-docpod"
+      spec:
+        containers:
+        - name: "docpod"
+          image: "${APPLICATION_NAME}-docpod:latest"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              scheme: 'HTTP'
+              port: 8080
+              path: '/index.html'
+              httpHeaders:
+                - name: 'X-Forwarded-Proto'
+                  value: 'https'
+                - name: 'X-Probe-Type'
+                  value: 'readiness'
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelayTimeout: 5
+            timeoutSeconds: 1
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              scheme: 'HTTP'
+              port: 8080
+              path: '/index.html'
+            httpHeaders:
+              - name: 'X-Forwarded-Proto'
+                value: 'https'
+              - name: 'X-Probe-Type'
+                value: 'liveness'
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelayTimeout: 5
+            timeoutSeconds: 1
+            periodSeconds: 5
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${APPLICATION_NAME}-docpod"
+    labels:
+      app: "${APPLICATION_NAME}"
+      delete: "${APPLICATION_NAME}-docpod"
+      delete: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - name: '8080-tcp'
+      protocol: 'TCP'
+      port: 8080
+      targetPort: 8080
+    - name: '8443-tcp'
+      protocol: 'TCP'
+      port: 8443
+      targetPort: 8443
+    selector:
+      app: "${APPLICATION_NAME}"
+      deploymentconfig: "${APPLICATION_NAME}-docpod"
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${APPLICATION_NAME}-docpod"
+    labels:
+      app: "${APPLICATION_NAME}"
+      delete: "${APPLICATION_NAME}-docpod"
+      delete: ${APPLICATION_NAME}
+    annotations:
+      console.alpha.openshift.io/overview-app-route: 'true'
+  spec:
+    host: "${APPLICATION_URL}"
+    to:
+      kind: Service
+      name: "${APPLICATION_NAME}-docpod"
+      weight: 100
+    port:
+      targetPort: 8080-tcp
+    tls:
+      termination: 'edge'
+      insecureEdgeTerminationPolicy: 'Redirect'
