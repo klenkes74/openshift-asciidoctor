@@ -13,20 +13,20 @@ RUN scl enable python27 "pip install --upgrade pip" && scl enable python27 "pip 
 
 #RUN cat /usr/libexec/s2i/assemble
 
-RUN sed -i -e 's/set -e/set -e\\\
-\\\
-if [ !  -f index.adoc ] ; then\\\
-    echo "===================================================="\\\
-    echo "   No index.adoc!!!!"\\\
-    echo "===================================================="\\\
-    exit 1\\\
-fi\\\
-\\\
-for adoc in `find . -iname "*.adoc"` ; do\\\
-    echo "---> Converting: ${adoc} ..."\\\
-    scl enable python27 scl enable rh-ruby23 "asciidoctor \"${adoc}\""\\\
-    rm "${adoc}"\\\
-done\\\
+RUN sed -i -e 's/set -e/set -e\\\\
+\\\\
+if [ !  -f index.adoc ] ; then\\\\
+    echo "===================================================="\\\\
+    echo "   No index.adoc!!!!"\\\\
+    echo "===================================================="\\\\
+    exit 1\\\\
+fi\\\\
+\\\\
+for adoc in `find . -iname "*.adoc"` ; do\\\\
+    echo "---> Converting: ${adoc} ..."\\\\
+    scl enable python27 scl enable rh-ruby23 "asciidoctor \"${adoc}\""\\\\
+    rm "${adoc}"\\\\
+done\\\\
 /' /usr/libexec/s2i/assemble
 
 
