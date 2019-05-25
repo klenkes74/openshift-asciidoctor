@@ -15,7 +15,7 @@ RUN cat /usr/libexec/s2i/assemble
 
 RUN sed -i -e 's#\#! /bin/bash#\#! /bin/bash\n\
 \n\
-pushd .
+pushd .\n\
 if [ !  -f index.adoc ] ; then\n\
 	echo "===================================================="\n\
 	echo "   No index.adoc!!!!"\n\
