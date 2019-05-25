@@ -11,11 +11,10 @@ RUN scl enable rh-ruby23 "gem install --no-document asciidoctor:${ASCIIDOCTOR_VE
 
 RUN scl enable python27 "pip install --upgrade pip" && scl enable python27 "pip install --no-cache-dir actdiag blockdiag[pdf] nwdiag Pygments seqdiag" && rm -rf .cache
 
-RUN cat /usr/libexec/s2i/assemble
+#RUN cat /usr/libexec/s2i/assemble
 
-RUN sed -i -e 's#set -e#set -e\n\
+RUN sed -i -e 's/set -e/set -e\n\
 \n\
-pushd .\n\
 if [ !  -f index.adoc ] ; then\n\
 	echo "===================================================="\n\
 	echo "   No index.adoc!!!!"\n\
@@ -27,8 +26,7 @@ for adoc in `find . -iname "*.adoc"` ; do\n\
 	echo "---> Converting: ${adoc} ..."\n\
 	scl enable python27 scl enable rh-ruby23 "asciidoctor \"${adoc}\""\n\
 	rm "${adoc}"\n\
-done\n\
-popd\n\n\#' /usr/libexec/s2i/assemble
+done\n\n\/' /usr/libexec/s2i/assemble
 
 
 USER 1001
