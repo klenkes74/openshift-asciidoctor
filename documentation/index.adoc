@@ -5,7 +5,7 @@
 
 = AsciiDoc S2I Build
 Roland T. Lichti <rlchti@kaiserpfalz-edv.de>
-{version}, {docdate}
+link:history.html[{version}], {docdate}
 
 
 == Abstract
@@ -39,3 +39,5 @@ project can use it.
 So one you built the container via asciidoctor-s2i in a build project of your own choice you can put the container image
 into the openshift project and use it from everywhere. With the documentation.yaml you have a nice template that can be
 easily digested in all projects of that cluster to generate the static documentation.
+
+

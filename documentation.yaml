@@ -96,6 +96,9 @@ objects:
       - imageChange:
         type: ImageChange
       - type: ConfigChange
+      - github:
+        secretReference:
+          name: ${APPLICATION_NAME}-docpod
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
   metadata:
