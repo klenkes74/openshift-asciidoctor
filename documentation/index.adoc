@@ -1,7 +1,7 @@
 :stylesheet: css/fedora.css
 :icon: font
 :toc: left
-:version: v1.0
+:version: v1.0.1
 
 = AsciiDoc S2I Build
 Roland T. Lichti <rlchti@kaiserpfalz-edv.de>
@@ -17,7 +17,7 @@ This project provides an OpenShift compatible source-to-image build containter f
 checked in on git into a stand-alone static documentation pod. It s splitted into two parts:
 
 * link:create-builder.html[generating the build container]
-* ling:create-documentation.html[generating documentation]
+* link:create-documentation.html[generating documentation]
 
 
 == Install the asciidoc-s2i builder
