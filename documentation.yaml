@@ -79,10 +79,10 @@ objects:
         memory: 512Mi
     runPolicy: Serial
     source:
+      contextDir: documentation
       git:
         ref: master
         uri: 'https://github.com/klenkes74/openshift-asciidoctor.git'
-        contextDir: documentation
       type: Git
     strategy:
       sourceStrategy:
