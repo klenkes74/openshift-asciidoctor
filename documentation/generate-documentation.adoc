@@ -1,0 +1,21 @@
+:stylesheet: css/fedora.css
+:icon: font
+:version: v1.0.2
+:toc: left
+
+= Generate documentation
+Roland T. Lichti
+{version}, {docdate}
+
+
+== tl;dr:
+The easiest way is to use the template provided as documentation.yaml.
+
+== Where to place documentation
+The documentation is cloned from a git repo. So you need the coordinates of one. Normally they consist of the URL and
+the branch to use. If the documentation does not start at the root directory of the git repo, you can also add a
+contextDir to define the entry point of the documentation.
+
+== Basic requirements
+The minimal requirement is a file called index.adoc for providing the index.html of the documentation pod.
+
