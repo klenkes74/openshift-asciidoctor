@@ -44,7 +44,7 @@ objects:
       description: The documentation of 
       template.alpha.openshift.io/wait-for-ready: 'true'
     labels:
-      temlate: docpod
+      template: docpod
       delete: ${APPLICATION_NAME}-docpod
     name: ${APPLICATION_NAME}-docpod
   spec:
@@ -93,17 +93,19 @@ objects:
       type: Source
     successfulBuildsHistoryLimit: 2
     triggers:
-      - imageChange:
-        type: ImageChange
-      - type: ConfigChange
-      - github:
+    - imageChange:
+      type: ImageChange
+    - type: ConfigChange
+    - github:
         secretReference:
           name: ${APPLICATION_NAME}-docpod
+      type: GitHub
+
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
   metadata:
     labels:
-      temlate: docpod
+      template: docpod
       delete: ${APPLICATION_NAME}-docpod
     name: ${APPLICATION_NAME}-docpod
   spec:
@@ -114,7 +116,7 @@ objects:
   metadata:
     name: ${APPLICATION_NAME}-docpod
     labels:
-      temlate: docpod
+      template: docpod
       delete: ${APPLICATION_NAME}-docpod
       delete: ${APPLICATION_NAME}
   type: Opaque
@@ -136,15 +138,15 @@ objects:
       app: "${APPLICATION_NAME}"
       deploymentConfig: "${APPLICATION_NAME}-docpod"
     triggers:
-      - type: ConfigChange
-      - type: ImageChange
-        imageChangeParams:
-          automatic: true
-          containerNames:
-          - wordpress
-          from:
-            kind: ImageStreamTag
-            name: "${APPLICATION_NAME}-docpod:latest"
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - docpod
+        from:
+          kind: ImageStreamTag
+          name: "${APPLICATION_NAME}-docpod:latest"
     template:
       metadata:
         labels:
