@@ -1,4 +1,4 @@
-FROM openshift/nginx:1.12
+FROM openshift/nginx:1.14
 
 EXPOSE 8080
 EXPOSE 8443
@@ -10,8 +10,6 @@ RUN yum install -y centos-release-scl-rh && yum install -y bash curl ca-certific
 RUN scl enable rh-ruby23 "gem install --no-document asciidoctor:${ASCIIDOCTOR_VERSION} asciidoctor-confluence:${ASCIIDOCTOR_CONFLUENCE_VERSION} asciidoctor-diagram:${ASCIIDOCTOR_DIAGRAM_VERSION} asciimath asciidoctor-revealjs:${ASCIIDOCTOR_REVEALJS_VERSION} coderay epubcheck:3.0.1 haml kindlegen:3.0.3 pygments.rb rake rouge slim thread_safe tilt graphviz"
 
 RUN scl enable python27 "pip install --upgrade pip" && scl enable python27 "pip install --no-cache-dir actdiag blockdiag[pdf] nwdiag Pygments seqdiag" && rm -rf .cache
-
-#RUN cat /usr/libexec/s2i/assemble
 
 RUN sed -i -e 's/set -e/set -e\n\
 \n\
@@ -27,7 +25,7 @@ for adoc in `find . -iname "*.adoc"` ; do\n\
     scl enable python27 scl enable rh-ruby23 "asciidoctor \"${adoc}\""\n\
     rm "${adoc}"\n\
 done\n\
-/' ${STI_SCRIPTS_PATH}/assemble && cat ${STI_SCRIPTS_PATH}/assemble
+/' ${STI_SCRIPTS_PATH}/assemble
 
 USER 1001
 CMD ${STI_SCRIPTS_PATH}/usage
