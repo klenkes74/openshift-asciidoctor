@@ -33,6 +33,11 @@ parameters:
   description: The version of the PDF plugin for asciidoctor.
   required: true
   value: '1.5.0.alpha.17'
+- name: ASCIIDOCTOR_BIBLIOGRAPHY_VERSION
+  displayName: Version (ASCIIDOCTOR bibliography)
+  description: The version of the bibliography generation plugin for asciidoctor.
+  required: true
+  value: '0.8.0'
 - name: ASCIIDOCTOR_DIAGRAM_VERSION
   displayName: Version (ASCIIDOCTOR Diagram)
   description: The version of the diagram plugin for asciidoctor.
@@ -87,8 +92,10 @@ objects:
           value: "${ASCIIDOCTOR_VERSION}"
         - name: ASCIIDOCTOR_CONFLUENCE_VERSION
           value: "${ASCIIDOCTOR_CONFLUENCE_VERSION}"
-        - name: asciidoctor_pdf_version
+        - name: ASCIIDOCTOR_PDF_VERSION
           value: "${ASCIIDOCTOR_PDF_VERSION}"
+        - name: ASCIIDOCTOR_BIBLIOGRAPHY_VERSION
+          value: "${ASCIIDOCTOR_BIBLIOGRAPHY_VERSION}"
         - name: ASCIIDOCTOR_DIAGRAM_VERSION
           value: "${ASCIIDOCTOR_DIAGRAM_VERSION}"
         - name: ASCIIDOCTOR_EPUB3_VERSION
