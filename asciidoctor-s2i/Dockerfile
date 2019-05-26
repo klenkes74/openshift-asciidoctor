@@ -1,4 +1,4 @@
-FROM openshift/nginx:1.12
+FROM openshift/nginx:1.14
 
 EXPOSE 8080
 EXPOSE 8443
@@ -13,9 +13,7 @@ RUN scl enable python27 "pip install --upgrade pip" && scl enable python27 "pip 
 
 RUN sed -i -e 's/set -e/set -e\n\
 \n\
-env\n\
-ls -la \/etc\/scl\/conf \/tmp\/src .\n\
-cp -a \/tmp\/src\/* .\n\
+cp -a \/tmp\/src\/*.\n\
 \n\
 if [ !  -f index.adoc ] ; then\n\
     echo "===================================================="\n\
