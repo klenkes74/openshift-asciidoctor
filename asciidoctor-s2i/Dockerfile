@@ -13,7 +13,7 @@ RUN scl enable python27 "pip install --upgrade pip" && scl enable python27 "pip 
 
 RUN sed -i -e 's/set -e/set -e\n\
 \n\
-cp -a \/tmp\/src\/*.\n\
+cp -a \/tmp\/src\/* .\n\
 \n\
 if [ !  -f index.adoc ] ; then\n\
     echo "===================================================="\n\
