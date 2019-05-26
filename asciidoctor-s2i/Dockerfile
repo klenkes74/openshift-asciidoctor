@@ -11,10 +11,10 @@ RUN scl enable rh-ruby23 "gem install --no-document asciidoctor:${ASCIIDOCTOR_VE
 
 RUN scl enable python27 "pip install --upgrade pip" && scl enable python27 "pip install --no-cache-dir actdiag blockdiag[pdf] nwdiag Pygments seqdiag" && rm -rf .cache
 
-RUN pwd
-
 RUN sed -i -e 's/set -e/set -e\n\
 \n\
+env\n\
+ls -la \/etc\/scl\/conf \/tmp\/src .\n\
 cp -a \/tmp\/src\/* .\n\
 \n\
 if [ !  -f index.adoc ] ; then\n\
@@ -26,7 +26,7 @@ fi\n\
 \n\
 for adoc in `find . -iname "*.adoc"` ; do\n\
     echo "---> Converting: ${adoc} ..."\n\
-    scl enable python27 scl enable rh-ruby23 "asciidoctor \"${adoc}\""\n\
+    scl enable python27 rh-ruby23 "asciidoctor \"${adoc}\""\n\
     rm "${adoc}"\n\
 done\n\
 /' ${STI_SCRIPTS_PATH}/assemble
