@@ -5,7 +5,7 @@
 
 = AsciiDoc S2I Build
 Roland T. Lichti <rlchti@kaiserpfalz-edv.de>
-{version} link:history.html[(history)], {docdate}
+{version}, {docdate}
 
 
 == Abstract
@@ -40,4 +40,4 @@ So one you built the container via asciidoctor-s2i in a build project of your ow
 into the openshift project and use it from everywhere. With the documentation.yaml you have a nice template that can be
 easily digested in all projects of that cluster to generate the static documentation.
 
-
+include::history.adoc[leveloffset=+1]
