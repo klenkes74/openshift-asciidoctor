@@ -1,11 +1,11 @@
 :stylesheet: css/fedora.css
 :icon: font
 :toc: left
-:version: v1.0.1
+:version: v1.0.2
 
 = AsciiDoc S2I Build
 Roland T. Lichti <rlchti@kaiserpfalz-edv.de>
-link:history.html[{version}], {docdate}
+{version} link:history.html[(history)], {docdate}
 
 
 == Abstract

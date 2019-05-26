@@ -1,6 +1,6 @@
 :stylesheet: css/fedora.css
 :icon: font
-:version: v1.0
+:version: v1.0.2
 :toc: left
 
 = Create The ASCIIDOCTOR source-to-image build container

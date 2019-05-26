@@ -1,19 +1,21 @@
 :stylesheet: css/fedora.css
 :icon: font
-:version: v1.0
 :toc: left
 
 = Version History
 Roland T. Lichti <rlichti@kaiserpfalz-edv.de>
-{version}, {docdate}
+{docdate}
 
 |===
 |Version|Date|Author|Description
 
-|v1.0   |2019-05-26|Roland T. Lichti <rlichti@kaiserpfalz-edv.de>
-|Initial release with basic functions
+|v1.0.2 |2019-05-26|Roland T. Lichti <rlichti@kaiserpfalz-edv.de>
+|Added the github trigger for documentation generation and fixed the version tag in index.adoc
 
 |v1.0.1 |2019-05-26|Roland T. Lichti <rlichti@kaiserpfalz-edv.de>
 |Typo in the documentation fixed to enable the links.
+
+|v1.0   |2019-05-26|Roland T. Lichti <rlichti@kaiserpfalz-edv.de>
+|Initial release with basic functions
 
 |===
