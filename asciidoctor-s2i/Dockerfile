@@ -29,8 +29,7 @@ for adoc in `find . -iname "*.adoc"` ; do\n\
     scl enable python27 scl enable rh-ruby23 "asciidoctor \"${adoc}\""\n\
     rm "${adoc}"\n\
 done\n\
-/' /usr/libexec/s2i/assemble
-
+/' ${STI_SCRIPTS_PATH}/assemble && cat ${STI_SCRIPTS_PATH}/assemble
 
 USER 1001
-CMD /usr/libexec/s2i/usage
+CMD ${STI_SCRIPTS_PATH}/usage
