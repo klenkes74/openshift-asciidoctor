@@ -1,8 +1,41 @@
-= AsciiDoc S2I Build
-
+:stylesheet: css/fedora.css
+:icon: font
 :toc: left
+:version: v1.0
 
- == Abstract
- This is a podified asciidoc generator. it takes a git repository (or parts thereof)
- and genertes a documentation pod with static HTML from the contents.
+= AsciiDoc S2I Build
+Roland T. Lichti <rlchti@kaiserpfalz-edv.de>
+{version}, {docdate}
 
+
+== Abstract
+This is a podified asciidoc generator. it takes a git repository (or parts thereof)
+and genertes a documentation pod with static HTML from the contents.
+
+== tl:dr;
+This project provides an OpenShift compatible source-to-image build containter for converting ASCIIDOCTOR documentation
+checked in on git into a stand-alone static documentation pod. It s splitted into two parts:
+
+* link:create-builder.html[generating the build container]
+* ling:create-documentation.html[generating documentation]
+
+
+== Install the asciidoc-s2i builder
+
+I provide two templates:
+
+|===
+|OpenShift Template |Purpose
+
+|asciidoctor-s2i.yaml
+|The template for creating the generic s2i build container. The container can be reused if put in a registry avaialable
+to all projects using it. For OpenShift or OKD the project openshift is a nice place for the image to live in.
+
+|documentation.yaml
+|The template for generating the documentation. It should be put into the openshift project of your cluster so any
+project can use it.
+|===
+
+So one you built the container via asciidoctor-s2i in a build project of your own choice you can put the container image
+into the openshift project and use it from everywhere. With the documentation.yaml you have a nice template that can be
+easily digested in all projects of that cluster to generate the static documentation.

@@ -1,0 +1,46 @@
+:stylesheet: css/fedora.css
+:icon: font
+:version: v1.0
+:toc: left
+
+= Create The ASCIIDOCTOR source-to-image build container
+Roland T. Lichti
+{version}, {docdate}
+
+
+== Due credits
+I'm not the inventor of this container. The container bases on https://github.com/asciidoctor/docker-asciidoctor - but I
+needed something based on CentOS and being able to work as source-to-image builder. But the base software collection is
+taken directly from the given project.
+
+== tl;dr:
+The container installs ruby 2.3 and python 2.7 and some modules for both to provide everything needed. Then the assemble
+script get's patched to include the asciidoc generation from all files matching the glob *.adoc.
+
+== Selecting the base container
+I selected the nginx s2i container as base since  I need a small webserver being able to serve static content. But you
+also could use the apache httpd s2i container without changing any more than the FROM line of the docker file. The
+behavior of the s2i build is the same for both, so if you favour the apache httpd, just do it.
+
+== Installing software
+
+=== Operating system packages
+There are some packages installed via the operating system provided YUM. Mainly base packages used later to install via
+gem and pip.
+
+=== Ruby Gems
+The main installation is the ruby part. A lot of gems get installed by the docker file.
+
+=== Python
+And some parts are provided via pip.
+
+=== Cleaning up
+To keep the image small it is import to clean up after installation by removing the downloaded packages.
+
+
+== Patching the source-to-image scripts
+The build scripts take care of copying the content and the nginx configurations. So you can use every configuration
+method and file provided by the base nginx container. But we need to convert asciidoctor files to html since otherwise
+nginx could not serve the data in a nice understandable format.
+
+So we patch the existing nginx-caring s2i assemble script to also take care of the asciidoctor conversion.
