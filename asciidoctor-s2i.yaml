@@ -149,7 +149,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:latest"
+        name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:test"
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
   metadata:
