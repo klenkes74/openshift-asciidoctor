@@ -1,0 +1,38 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: asciidoctor-s2i
+  labels:
+    template: asciidoctor-s2i
+  annotations:
+    description: >-
+      An asciidoctor s2i builder. All files named *.adoc will be converted.
+      you need a file index.adoc as central page.
+    iconClass: icon-nginx
+    openshift.io/display-name: AsciiDoctor S2I Builder
+    openshift.io/documentation-url: 'https://github.com/klenkes74/openshift-asciidoctor'
+    openshift.io/long-description: >-
+      This image is an S2I builder running on top of the centos nginx image.
+    openshift.io/provider-display-name: 'Kaiserpfalz EDV-Service, Roland T. Lichti'
+    openshift.io/support-url: 'https://www.kaiserpfalz-edv.de'
+    tags: 'nginx,builder,cms'
+    template.openshift.io/bindable: 'false'
+parameters:
+- name: ASCIIDOCTOR_VERSION
+  displayName: Version (ASCIIDOCTOR)
+  description: The version of asciidoctor used.
+  required: true
+  value: '2.0.9'
+objects:
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+    namespace: openshift
+    labels:
+      template: asciidoctor-s2i
+      build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
+      delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+  spec:
+    lookupPolicy:
+      local: true

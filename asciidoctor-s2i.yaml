@@ -153,11 +153,11 @@ objects:
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
   metadata:
+    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     labels:
       template: asciidoctor-s2i
       build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
-    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   spec:
     lookupPolicy:
       local: true
