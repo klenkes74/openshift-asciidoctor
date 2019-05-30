@@ -6,6 +6,8 @@ def testApplication = applicationName + '-docpod'
 def targetImage = 'asciidoctor-s2i-' + ${ASCIIDOCTOR_VERSION}
 
 pipeline {
+  agent none
+
   options {
     timeout(time: 20, unit: 'MINUTES') 
   }
