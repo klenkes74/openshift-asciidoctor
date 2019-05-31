@@ -65,15 +65,15 @@ parameters:
   value: dGExdmFpZjhob3AwbmVpOEhlZTU=
 objects:
 - kind: BuildConfig
-  apiVersion: build.openshift.io/v1
+  apiVersion: v1
   metadata:
+    name: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}-pipeline
     labels:
       build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
       template: asciidoctor-s2i
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
-    name: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
   spec:
-    failedBuildsHistoryLimit: 1
+    failedBuildsHistoryLimit: 2
     successfulBuildsHistoryLimit: 3
     resources:
       limits:
@@ -86,7 +86,49 @@ objects:
         ref: "master"
       contextDir: "asciidoctor-s2i"
     strategy:
+      type: JenkinsPipeline
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: Jenkinsfile
+        env:
+        - name: ASCIIDOCTOR_VERSION
+          value: "${ASCIIDOCTOR_VERSION}"
+    triggers:
+    - type: GitHub
+      github:
+        secretReference:
+          name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+    - type: ConfigChange
+    - imageChange:
+        lastTriggeredImageID: docker-registry.default.svc:5000/openshift/nginx@sha256:e24f944339b6cd48ba74f6950d2e32e003c156d4e701ad4f4e5b3b7ac6b73230
+      type: ImageChange
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    name: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
+    labels:
+      build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
+      template: asciidoctor-s2i
+      delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
+  spec:
+    failedBuildsHistoryLimit: 1
+    successfulBuildsHistoryLimit: 1
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+    runPolicy: Serial
+    source:
+      git:
+        uri: "https://github.com/klenkes74/openshift-asciidoctor.git"
+        ref: "master"
+      contextDir: "asciidoctor-s2i"
+    strategy:
+      type: Docker
       dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: nginx:1.12
+          namespace: openshift
         env:
         - name: ASCIIDOCTOR_VERSION
           value: "${ASCIIDOCTOR_VERSION}"
@@ -104,32 +146,18 @@ objects:
           value: "${ASCIIDOCTOR_MATHEMATICAL_VERSION}"
         - name: ASCIIDOCTOR_REVEALJS_VERSION
           value: "${ASCIIDOCTOR_REVEALJS_VERSION}"
-        from:
-          kind: ImageStreamTag
-          name: nginx:1.12
-          namespace: openshift
-      type: Docker
     output:
       to:
         kind: ImageStreamTag
-        name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:latest"
-    triggers:
-    - type: GitHub
-      github:
-        secretReference:
-          name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
-    - type: ConfigChange
-    - imageChange:
-        lastTriggeredImageID: docker-registry.default.svc:5000/openshift/nginx@sha256:e24f944339b6cd48ba74f6950d2e32e003c156d4e701ad4f4e5b3b7ac6b73230
-      type: ImageChange
+        name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:test"
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
   metadata:
+    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
     labels:
       template: asciidoctor-s2i
       build: nginx-asciidoctor-base-${ASCIIDOCTOR_VERSION}
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
-    name: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   spec:
     lookupPolicy:
       local: true

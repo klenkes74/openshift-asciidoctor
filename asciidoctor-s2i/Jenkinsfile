@@ -1,0 +1,142 @@
+def templateName = 'docpod'
+def templateNameSpace = 'dev-images'
+def applicationName = 'docutest'
+def testApplication = applicationName + '-docpod'
+
+def targetBuild = 'nginx-asciidoctor-base-' + env.ASCIIDOCTOR_VERSION
+def targetImage = 'asciidoctor-s2i-' + env.ASCIIDOCTOR_VERSION
+
+pipeline {
+  agent none
+
+  options {
+    timeout(time: 20, unit: 'MINUTES') 
+  }
+  stages {
+    stage('preamble') {
+        steps {
+            script {
+                openshift.withCluster() {
+                    openshift.withProject() {
+                        echo "Using project: ${openshift.project()}"
+                        echo "Generating: ${targetBuild}"
+                        echo "Testing with: ${testApplication}"
+                    }
+                }
+            }
+        }
+    }
+    stage('build') {
+      steps {
+        script {
+            echo "building asciidoc-s2i builder ..."
+
+            openshift.withCluster() {
+                openshift.withProject() {
+                  def build = openshift.startBuild(targetBuild);
+
+                  timeout(15) { 
+                    build.untilEach(1) {
+                      return (it.object().status.phase == "Running")
+
+                    }
+                    
+                    builds.logs("-f")
+                  }
+                }
+            }
+        }
+      }
+    }
+    stage('pretest-cleanup') {
+      steps {
+        script {
+            echo "cleaning up test application ..."
+
+            openshift.withCluster() {
+                openshift.withProject() {
+                  openshift.selector("all", [ delete: testApplication ]).delete()
+
+                  if (openshift.selector("secret", testApplication).exists()) {
+                    openshift.selector("secret", testApplication).delete()
+                  }
+                }
+            }
+        }
+      }
+    }
+    stage('testing') {
+      steps {
+        script {
+            echo "Testing the newly created asciidoc-s2i bulder ..."
+
+            openshift.withCluster() {
+                def template = openshift.withProject(templateNameSpace) {
+	          openshift.selector('template', templateName).object()
+                }
+
+                openshift.withProject() {
+                  try {
+                    openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName, "-p", "ASCIIDOCTOR_TAG=test"))
+                  } catch (err) {
+                     echo "in catch block"
+                     echo "Caught: ${err}"
+                  }          
+
+                  def bc = openshift.selector("bc", testApplication)
+                  def builds = bc.related('builds')
+                  echo "Found ${bc.count()} build configurations with ${builds.count()} builds!"
+
+                  timeout(15) { 
+                    builds.untilEach(1) {
+                      return (it.object().status.phase == "Running")
+
+                    }
+                    
+                    builds.logs("-f")
+                  }
+
+                  def dc = openshift.selector("dc", testApplication)
+                  def pods = dc.related('pods')
+                  echo "Found ${dc.count()} test deployment configurations with ${pods.count()} pods!"
+                  timeout(5) { 
+                    pods.untilEach(1) {
+                      return (it.object().status.phase == "Running")
+                    }
+                  }
+                }
+            }
+        }
+      }
+    }
+    stage('posttest-cleanup') {
+      steps {
+        script {
+            echo "cleaning up test application ..."
+
+            openshift.withCluster() {
+                openshift.withProject() {
+                  openshift.selector("all", [ delete: testApplication ]).delete() 
+
+                  if (openshift.selector("secrets", testApplication).exists()) { 
+                    openshift.selector("secrets", testApplication).delete()
+                  }
+                }
+            }
+        }
+      }
+    }
+    stage('tag') {
+      steps {
+        script {
+            echo "tagging tested image to 'latest' ..."
+            openshift.withCluster() {
+                openshift.withProject() {
+                  openshift.tag(targetImage + ":test", targetImage + ":latest") 
+                }
+            }
+        }
+      }
+    }
+  }
+}
