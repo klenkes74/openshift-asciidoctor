@@ -50,6 +50,23 @@ pipeline {
       }
     }
 */
+    stage('pretest-cleanup') {
+      steps {
+        script {
+            echo "cleaning up test application ..."
+
+            openshift.withCluster() {
+                openshift.withProject() {
+                  openshift.selector("all", [ delete: testApplication ]).delete()
+
+                  if (openshift.selector("secret", testApplication).exists()) {
+                    openshift.selector("secret", testApplication).delete()
+                  }
+                }
+            }
+        }
+      }
+    }
     stage('testing') {
       steps {
         script {
