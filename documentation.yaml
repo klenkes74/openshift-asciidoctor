@@ -38,7 +38,7 @@ parameters:
   value: 'latest'
 - name: ASCIIDOCTOR_ARGS
   displayName: Runtime arguments for ASCIIDOCTOR
-  description: Additional parameters for the ASCIIDOCTOR run. Defaulting to: '-n -t -v'
+  description: "Additional parameters for the ASCIIDOCTOR run. Defaulting to: '-n -t -v'"
   required: true
   value: '-n -t -v'
 - name: GITHUB_SECRET
