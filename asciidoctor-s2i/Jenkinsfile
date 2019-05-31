@@ -30,6 +30,7 @@ pipeline {
             openshift.withCluster() {
                 openshift.withProject() {
                   openshift.selector("all", [ delete: applicationName]).delete() 
+
                   if (openshift.selector("secrets", testApplication).exists()) { 
                     openshift.selector("secrets", testApplication).delete()
                   }
@@ -44,11 +45,13 @@ pipeline {
             openshift.withCluster() {
                 openshift.withProject() {
                   def builds = openshift.startBuild(targetBuild);
-                  timeout(5) { 
+
+                  timeout(15) { 
                     builds.untilEach(1) {
                       return (it.object().status.phase == "Running")
-                    }
 
+                    }
+                    
                     builds.logs("-f")
                   }
                 }
@@ -60,27 +63,22 @@ pipeline {
       steps {
         script {
             openshift.withCluster() {
-                openshift.withProject() {
-                  def builds = openshift.selector("bc", templateName).related('builds')
-                  timeout(5) { 
-                    builds.untilEach(1) {
-                      return (it.object().status.phase == "Complete")
-                    }
-                  }
-                }
-            }
-
-            openshift.withCluster() {
                 def template = openshift.withProject(templateNameSpace) {
 	          openshift.selector('template', templateName).object()
                 }
+
                 openshift.withProject() {
                   openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName))
-                }
-            }
 
-            openshift.withCluster() {
-                openshift.withProject() {
+                  def builds = openshift.startBuild(testApplication)
+                  timeout(5) { 
+                    builds.untilEach(1) {
+                      return (it.object().status.phase == "Running")
+                    }
+
+                    builds.logs("-f")
+                  }
+
                   def rm = openshift.selector("dc", testApplication).rollout().latest()
                   timeout(5) { 
                     openshift.selector("dc", testApplication).related('pods').untilEach(1) {
