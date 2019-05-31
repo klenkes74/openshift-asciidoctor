@@ -26,28 +26,30 @@ pipeline {
             }
         }
     }
-#    stage('build') {
-#      steps {
-#        script {
-#            echo "building asciidoc-s2i builder ..."
-#
-#            openshift.withCluster() {
-#                openshift.withProject() {
-#                  def builds = openshift.startBuild(targetBuild);
-#
-#                  timeout(15) { 
-#                    builds.untilEach(1) {
-#                      return (it.object().status.phase == "Running")
-#
-#                    }
-#                    
-#                    builds.logs("-f")
-#                  }
-#                }
-#            }
-#        }
-#      }
-#    }
+/*
+    stage('build') {
+      steps {
+        script {
+            echo "building asciidoc-s2i builder ..."
+
+            openshift.withCluster() {
+                openshift.withProject() {
+                  def builds = openshift.startBuild(targetBuild);
+
+                  timeout(15) { 
+                    builds.untilEach(1) {
+                      return (it.object().status.phase == "Running")
+
+                    }
+                    
+                    builds.logs("-f")
+                  }
+                }
+            }
+        }
+      }
+    }
+*/
     stage('testing') {
       steps {
         script {
