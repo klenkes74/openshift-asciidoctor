@@ -26,21 +26,6 @@ pipeline {
             }
         }
     }
-    stage('cleanup') {
-      steps {
-        script {
-            openshift.withCluster() {
-                openshift.withProject() {
-                  openshift.selector("all", [ delete: applicationName]).delete() 
-
-                  if (openshift.selector("secrets", testApplication).exists()) { 
-                    openshift.selector("secrets", testApplication).delete()
-                  }
-                }
-            }
-        }
-      }
-    }
     stage('build') {
       steps {
         script {
@@ -72,7 +57,7 @@ pipeline {
                 openshift.withProject() {
                   openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName))
 
-                  def builds = openshift.startBuild(testApplication)
+                  def builds = openshift.selector("bc", testApplication).related('build').latest()
                   timeout(5) { 
                     builds.untilEach(1) {
                       return (it.object().status.phase == "Running")
@@ -86,6 +71,21 @@ pipeline {
                     openshift.selector("dc", testApplication).related('pods').untilEach(1) {
                       return (it.object().status.phase == "Running")
                     }
+                  }
+                }
+            }
+        }
+      }
+    }
+    stage('cleanup') {
+      steps {
+        script {
+            openshift.withCluster() {
+                openshift.withProject() {
+                  openshift.selector("all", [ delete: testApplication]).delete() 
+
+                  if (openshift.selector("secrets", testApplication).exists()) { 
+                    openshift.selector("secrets", testApplication).delete()
                   }
                 }
             }
