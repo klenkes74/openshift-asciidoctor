@@ -34,6 +34,7 @@ pipeline {
             openshift.withCluster() {
                 openshift.withProject() {
                   def build = openshift.startBuild(targetBuild);
+		  echo "Working on build: ${build}"
 
                   timeout(15) { 
                     build.untilEach(1) {
