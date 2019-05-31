@@ -50,9 +50,7 @@ objects:
       template.alpha.openshift.io/wait-for-ready: 'true'
     labels:
       template: docpod
-      delete:
-      - ${APPLICATION_NAME}-docpod
-      - ${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
     name: ${APPLICATION_NAME}-docpod
   spec:
     completionDeadlineSeconds: 600
@@ -113,9 +111,7 @@ objects:
   metadata:
     labels:
       template: docpod
-      delete:
-      - ${APPLICATION_NAME}-docpod
-      - ${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
     name: ${APPLICATION_NAME}-docpod
   spec:
     lookupPolicy:
@@ -126,9 +122,7 @@ objects:
     name: ${APPLICATION_NAME}-docpod
     labels:
       template: docpod
-      delete:
-      - ${APPLICATION_NAME}-docpod
-      - ${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
   type: Opaque
   data:
     WebHookSecretKey: ${GITHUB_SECRET}
@@ -139,9 +133,7 @@ objects:
     labels:
       template: docpod
       app: ${APPLICATION_NAME}
-      delete:
-      - ${APPLICATION_NAME}-docpod
-      - ${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
   spec:
     replicas: 1
     revisionHistoryLimit: 3
@@ -215,9 +207,7 @@ objects:
     name: "${APPLICATION_NAME}-docpod"
     labels:
       app: "${APPLICATION_NAME}"
-      delete:
-      - ${APPLICATION_NAME}-docpod
-      - ${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
   spec:
     ports:
     - name: '8080-tcp'
@@ -241,9 +231,7 @@ objects:
     name: "${APPLICATION_NAME}-docpod"
     labels:
       app: "${APPLICATION_NAME}"
-      delete:
-      - ${APPLICATION_NAME}-docpod
-      - ${APPLICATION_NAME}
+      delete: ${APPLICATION_NAME}-docpod
     annotations:
       console.alpha.openshift.io/overview-app-route: 'true'
   spec:
