@@ -86,10 +86,8 @@ pipeline {
                   }          
 
                   def bc = openshift.selector("bc", testApplication)
-                  echo "Found ${bc.count()} build configurations!"
-
                   def builds = bc.related('builds')
-                  echo "Found ${builds.count()} builds for this configuration!"
+                  echo "Found ${bc.count()} build configurations with ${builds.count()} builds!"
 
                   timeout(15) { 
                     builds.untilEach(1) {
@@ -100,9 +98,11 @@ pipeline {
                     builds.logs("-f")
                   }
 
-                  def rm = openshift.selector("dc", testApplication).rollout().latest()
+                  def dc = openshift.selector("dc", testApplication)
+                  def pods = df.related('pods')
+                  echo "Found ${dc.count()} test deployment configurations with ${pods.count()} pods!"
                   timeout(5) { 
-                    openshift.selector("dc", testApplication).related('pods').untilEach(1) {
+                    pods.untilEach(1) {
                       return (it.object().status.phase == "Running")
                     }
                   }
