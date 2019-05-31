@@ -29,6 +29,8 @@ pipeline {
     stage('build') {
       steps {
         script {
+            echo "building asciidoc-s2i builder ..."
+
             openshift.withCluster() {
                 openshift.withProject() {
                   def builds = openshift.startBuild(targetBuild);
@@ -46,37 +48,24 @@ pipeline {
         }
       }
     }
-    stage('pretest-cleanup') {
+    stage('testing') {
       steps {
         script {
-          try {
-            openshift.withCluster() {
-                openshift.withProject() {
-                  openshift.selector("all", [ delete: testApplication]).delete() 
+            echo "Testing the newly created asciidoc-s2i bulder ..."
 
-                  if (openshift.selector("secrets", testApplication).exists()) { 
-                    openshift.selector("secrets", testApplication).delete()
-                  }
-                }
-            }
-          } catch (err) {
-             echo "in catch block"
-             echo "Caught: ${err}"
-             currentBuild.result = 'FAILURE'
-          }          
-        }
-      }
-    }
-    stage('deploy') {
-      steps {
-        script {
             openshift.withCluster() {
                 def template = openshift.withProject(templateNameSpace) {
 	          openshift.selector('template', templateName).object()
                 }
 
                 openshift.withProject() {
-                  openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName))
+                  try {
+                    openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName))
+                  } catch (err) {
+                     echo "in catch block"
+                     echo "Caught: ${err}"
+                     currentBuild.result = 'FAILURE'
+                  }          
 
                   sleep 5
 
@@ -104,9 +93,11 @@ pipeline {
     stage('posttest-cleanup') {
       steps {
         script {
+            echo "cleaning up test application ..."
+
             openshift.withCluster() {
                 openshift.withProject() {
-                  openshift.selector("all", [ delete: testApplication]).delete() 
+                  openshift.selector("all", [ delete: testApplication ]).delete() 
 
                   if (openshift.selector("secrets", testApplication).exists()) { 
                     openshift.selector("secrets", testApplication).delete()
@@ -119,6 +110,7 @@ pipeline {
     stage('tag') {
       steps {
         script {
+            echo "tagging tested image to 'latest' ..."
             openshift.withCluster() {
                 openshift.withProject() {
                   openshift.tag(targetImage + ":test", targetImage + ":latest") 
