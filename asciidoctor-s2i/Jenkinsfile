@@ -46,6 +46,27 @@ pipeline {
         }
       }
     }
+    stage('pretest-cleanup') {
+      steps {
+        script {
+          try {
+            openshift.withCluster() {
+                openshift.withProject() {
+                  openshift.selector("all", [ delete: testApplication]).delete() 
+
+                  if (openshift.selector("secrets", testApplication).exists()) { 
+                    openshift.selector("secrets", testApplication).delete()
+                  }
+                }
+            }
+          } catch (err) {
+             echo "in catch block"
+             echo "Caught: ${err}"
+             currentBuild.result = 'FAILURE'
+          }          
+        }
+      }
+    }
     stage('deploy') {
       steps {
         script {
@@ -57,8 +78,11 @@ pipeline {
                 openshift.withProject() {
                   openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName))
 
-                  def builds = openshift.selector("bc", testApplication).related('build').latest()
+                  sleep 5
+
                   timeout(5) { 
+                    def builds = openshift.selector("bc", testApplication).related('build').latest()
+
                     builds.untilEach(1) {
                       return (it.object().status.phase == "Running")
                     }
@@ -77,7 +101,7 @@ pipeline {
         }
       }
     }
-    stage('cleanup') {
+    stage('posttest-cleanup') {
       steps {
         script {
             openshift.withCluster() {
