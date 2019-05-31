@@ -3,6 +3,7 @@ def templateNameSpace = 'dev-images'
 def applicationName = 'docutest'
 def testApplication = applicationName + '-docpod'
 
+def targetBuild = 'ngingx-asciidoctor-base-2.0.9'
 def targetImage = 'asciidoctor-s2i-2.0.9'
 
 pipeline {
@@ -42,7 +43,7 @@ pipeline {
         script {
             openshift.withCluster() {
                 openshift.withProject() {
-                  def builds = openshift.selector("bc", targetImage).related('builds')
+                  def builds = openshift.selector("bc", targetBuild).related('builds')
                   timeout(5) { 
                     builds.untilEach(1) {
                       return (it.object().status.phase == "Complete")
