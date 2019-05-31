@@ -66,20 +66,7 @@ pipeline {
                   } catch (err) {
                      echo "in catch block"
                      echo "Caught: ${err}"
-                     currentBuild.result = 'FAILURE'
                   }          
-
-                  sleep 5
-
-                  timeout(5) { 
-                    def builds = openshift.selector("bc", testApplication).related('builds').latest()
-
-                    builds.untilEach(1) {
-                      return (it.object().status.phase == "Running")
-                    }
-
-                    builds.logs("-f")
-                  }
 
                   def rm = openshift.selector("dc", testApplication).rollout().latest()
                   timeout(5) { 
