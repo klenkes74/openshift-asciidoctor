@@ -85,7 +85,9 @@ pipeline {
                      echo "Caught: ${err}"
                   }          
 
-                  def builds = openshift.selector("bc", testApplication).object().related('builds').latest()
+                  echo "working with: " + openshift.selector("bc", testApplication).object()
+
+                  def builds = openshift.selector("bc", testApplication)).related('builds').latest()
                   timeout(5) {
                     builds.untilEach(1) {
                       return (it.obect().status.pase == "Complete")
