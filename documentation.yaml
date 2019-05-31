@@ -46,6 +46,7 @@ objects:
     labels:
       template: docpod
       delete: ${APPLICATION_NAME}-docpod
+      delete: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-docpod
   spec:
     completionDeadlineSeconds: 600
@@ -107,6 +108,7 @@ objects:
     labels:
       template: docpod
       delete: ${APPLICATION_NAME}-docpod
+      delete: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-docpod
   spec:
     lookupPolicy:
