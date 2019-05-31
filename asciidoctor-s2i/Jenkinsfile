@@ -26,6 +26,7 @@ pipeline {
             }
         }
     }
+/*
     stage('build') {
       steps {
         script {
@@ -33,10 +34,10 @@ pipeline {
 
             openshift.withCluster() {
                 openshift.withProject() {
-                  def builds = openshift.startBuild(targetBuild);
+                  def build = openshift.startBuild(targetBuild);
 
                   timeout(15) { 
-                    builds.untilEach(1) {
+                    build.untilEach(1) {
                       return (it.object().status.phase == "Running")
 
                     }
@@ -48,6 +49,7 @@ pipeline {
         }
       }
     }
+*/
     stage('testing') {
       steps {
         script {
@@ -65,6 +67,16 @@ pipeline {
                      echo "in catch block"
                      echo "Caught: ${err}"
                   }          
+
+                  def bc = openshift.selector("bc", testApplication)
+                  echo bc
+                  def builds = bc.related('build')
+                  echo builds
+                  timeout(5) {
+                    builds.untilEach(1) {
+                      return (it.obect().status.pase == "Complete")
+                    }
+                  }
 
                   def rm = openshift.selector("dc", testApplication).rollout().latest()
                   timeout(5) { 
