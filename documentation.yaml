@@ -36,6 +36,11 @@ parameters:
   description: The tag of the asciidoc builder
   required: true
   value: 'latest'
+- name: ASCIIDOCTOR_ARGS
+  displayName: Runtime arguments for ASCIIDOCTOR
+  description: Additional parameters for the ASCIIDOCTOR run. Defaulting to: '-n -t -v'
+  required: true
+  value: '-n -t -v'
 - name: GITHUB_SECRET
   displayName: GitHub WebHook Secret
   description: The BASE64 encoded GitHub WebHook Secret
@@ -54,6 +59,7 @@ objects:
     name: ${APPLICATION_NAME}-docpod
   spec:
     completionDeadlineSeconds: 600
+    successfulBuildsHistoryLimit: 1
     failedBuildsHistoryLimit: 1
     output:
       imageLabels:
@@ -95,8 +101,10 @@ objects:
           kind: ImageStreamTag
           name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:${ASCIIDOCTOR_TAG}"
           namespace: dev-images
+        env:
+        - name: ASCIIDOCTOR_ARGS
+          value: "${ASCIIDOCTOR_ARGS}"
       type: Source
-    successfulBuildsHistoryLimit: 2
     triggers:
     - imageChange:
       type: ImageChange
@@ -105,7 +113,6 @@ objects:
         secretReference:
           name: ${APPLICATION_NAME}-docpod
       type: GitHub
-
 - kind: ImageStream
   apiVersion: image.openshift.io/v1
   metadata:

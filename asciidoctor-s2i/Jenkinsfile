@@ -26,7 +26,6 @@ pipeline {
             }
         }
     }
-/*
     stage('build') {
       steps {
         script {
@@ -49,7 +48,6 @@ pipeline {
         }
       }
     }
-*/
     stage('pretest-cleanup') {
       steps {
         script {

@@ -73,7 +73,7 @@ objects:
       template: asciidoctor-s2i
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   spec:
-    failedBuildsHistoryLimit: 1
+    failedBuildsHistoryLimit: 2
     successfulBuildsHistoryLimit: 3
     resources:
       limits:
@@ -111,7 +111,7 @@ objects:
       delete: asciidoctor-s2i-${ASCIIDOCTOR_VERSION}
   spec:
     failedBuildsHistoryLimit: 1
-    successfulBuildsHistoryLimit: 3
+    successfulBuildsHistoryLimit: 1
     resources:
       limits:
         cpu: 2000m

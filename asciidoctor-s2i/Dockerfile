@@ -24,8 +24,8 @@ fi\n\
 \n\
 for adoc in `find . -iname "*.adoc"` ; do\n\
     echo "---> Converting: ${adoc} ..."\n\
-    scl enable python27 rh-ruby23 "asciidoctor -b xhtml5 --safe -n -v -t -r asciidoctor-diagram \"${adoc}\""\n\
-    scl enable python27 rh-ruby23 "asciidoctor-pdf -b xhtml5 --safe -n -v -t -r asciidoctor-diagram \"${adoc}\""\n\
+    scl enable python27 rh-ruby23 "asciidoctor -b xhtml5 --safe ${ASCIIDOCTOR_ARGS} -r asciidoctor-diagram \"${adoc}\""\n\
+    scl enable python27 rh-ruby23 "asciidoctor-pdf -b xhtml5 --safe ${ASCIIDOCTOR_ARGS} -r asciidoctor-diagram \"${adoc}\""\n\
 done\n\
 /' ${STI_SCRIPTS_PATH}/assemble
 
