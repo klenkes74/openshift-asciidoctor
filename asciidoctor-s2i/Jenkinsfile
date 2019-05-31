@@ -43,11 +43,13 @@ pipeline {
         script {
             openshift.withCluster() {
                 openshift.withProject() {
-                  def builds = openshift.selector("bc", targetBuild).related('builds')
+                  def builds = openshift.startBuild(targetBuild);
                   timeout(5) { 
                     builds.untilEach(1) {
-                      return (it.object().status.phase == "Complete")
+                      return (it.object().status.phase == "Running")
                     }
+
+                    builds.logs("-f")
                   }
                 }
             }
