@@ -99,7 +99,7 @@ pipeline {
                   }
 
                   def dc = openshift.selector("dc", testApplication)
-                  def pods = df.related('pods')
+                  def pods = dc.related('pods')
                   echo "Found ${dc.count()} test deployment configurations with ${pods.count()} pods!"
                   timeout(5) { 
                     pods.untilEach(1) {
