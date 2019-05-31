@@ -72,7 +72,7 @@ pipeline {
                   sleep 5
 
                   timeout(5) { 
-                    def builds = openshift.selector("build", testApplication).latest()
+                    def builds = openshift.selector("buildconfig", testApplication).latest()
 
                     builds.untilEach(1) {
                       return (it.object().status.phase == "Running")
