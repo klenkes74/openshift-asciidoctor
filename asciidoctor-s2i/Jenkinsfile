@@ -37,18 +37,12 @@ pipeline {
         }
       }
     }
-    stage('create') {
-      steps {
-        script {
-        }
-      }
-    }
     stage('build') {
       steps {
         script {
             openshift.withCluster() {
                 openshift.withProject() {
-                  def builds = openshift.selector("bc", templateName).related('builds')
+                  def builds = openshift.selector("bc", targetImage).related('builds')
                   timeout(5) { 
                     builds.untilEach(1) {
                       return (it.object().status.phase == "Complete")
@@ -62,6 +56,17 @@ pipeline {
     stage('deploy') {
       steps {
         script {
+            openshift.withCluster() {
+                openshift.withProject() {
+                  def builds = openshift.selector("bc", templateName).related('builds')
+                  timeout(5) { 
+                    builds.untilEach(1) {
+                      return (it.object().status.phase == "Complete")
+                    }
+                  }
+                }
+            }
+
             openshift.withCluster() {
                 def template = openshift.withProject(templateNameSpace) {
 	          openshift.selector('template', templateName).object()
