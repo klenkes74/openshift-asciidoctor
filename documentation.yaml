@@ -31,6 +31,11 @@ parameters:
   description: The version of asciidoctor used.
   required: true
   value: '2.0.9'
+- name: ASCIIDOCTOR_TAG
+  displayName: Version Tag (ASCIIDOCTOR)
+  description: The tag of the asciidoc builder
+  required: true
+  value: 'latest'
 - name: GITHUB_SECRET
   displayName: GitHub WebHook Secret
   description: The BASE64 encoded GitHub WebHook Secret
@@ -45,8 +50,9 @@ objects:
       template.alpha.openshift.io/wait-for-ready: 'true'
     labels:
       template: docpod
-      delete: ${APPLICATION_NAME}-docpod
-      delete: ${APPLICATION_NAME}
+      delete:
+      - ${APPLICATION_NAME}-docpod
+      - ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-docpod
   spec:
     completionDeadlineSeconds: 600
@@ -89,7 +95,7 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:latest"
+          name: "asciidoctor-s2i-${ASCIIDOCTOR_VERSION}:${ASCIIDOCTOR_TAG}"
           namespace: dev-images
       type: Source
     successfulBuildsHistoryLimit: 2
@@ -107,8 +113,9 @@ objects:
   metadata:
     labels:
       template: docpod
-      delete: ${APPLICATION_NAME}-docpod
-      delete: ${APPLICATION_NAME}
+      delete:
+      - ${APPLICATION_NAME}-docpod
+      - ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-docpod
   spec:
     lookupPolicy:
@@ -119,8 +126,9 @@ objects:
     name: ${APPLICATION_NAME}-docpod
     labels:
       template: docpod
-      delete: ${APPLICATION_NAME}-docpod
-      delete: ${APPLICATION_NAME}
+      delete:
+      - ${APPLICATION_NAME}-docpod
+      - ${APPLICATION_NAME}
   type: Opaque
   data:
     WebHookSecretKey: ${GITHUB_SECRET}
@@ -131,8 +139,9 @@ objects:
     labels:
       template: docpod
       app: ${APPLICATION_NAME}
-      delete: "${APPLICATION_NAME}-docpod"
-      delete: ${APPLICATION_NAME}
+      delete:
+      - ${APPLICATION_NAME}-docpod
+      - ${APPLICATION_NAME}
   spec:
     replicas: 1
     revisionHistoryLimit: 3
@@ -206,8 +215,9 @@ objects:
     name: "${APPLICATION_NAME}-docpod"
     labels:
       app: "${APPLICATION_NAME}"
-      delete: "${APPLICATION_NAME}-docpod"
-      delete: ${APPLICATION_NAME}
+      delete:
+      - ${APPLICATION_NAME}-docpod
+      - ${APPLICATION_NAME}
   spec:
     ports:
     - name: '8080-tcp'
@@ -231,8 +241,9 @@ objects:
     name: "${APPLICATION_NAME}-docpod"
     labels:
       app: "${APPLICATION_NAME}"
-      delete: "${APPLICATION_NAME}-docpod"
-      delete: ${APPLICATION_NAME}
+      delete:
+      - ${APPLICATION_NAME}-docpod
+      - ${APPLICATION_NAME}
     annotations:
       console.alpha.openshift.io/overview-app-route: 'true'
   spec:

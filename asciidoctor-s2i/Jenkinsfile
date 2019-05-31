@@ -60,7 +60,7 @@ pipeline {
 
                 openshift.withProject() {
                   try {
-                    openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName))
+                    openshift.create( openshift.process(template, "-p", "APPLICATION_NAME=" + applicationName, "-p", "ASCIIDOCTOR_TAG=test"))
                   } catch (err) {
                      echo "in catch block"
                      echo "Caught: ${err}"
