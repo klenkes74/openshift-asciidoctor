@@ -3,7 +3,7 @@ def templateNameSpace = 'dev-images'
 def applicationName = 'docutest'
 def testApplication = applicationName + '-docpod'
 
-def targetImage = 'asciidoctor-s2i-' + ${ASCIIDOCTOR_VERSION}
+def targetImage = 'asciidoctor-s2i-2.0.9'
 
 pipeline {
   agent none
@@ -94,7 +94,7 @@ pipeline {
         script {
             openshift.withCluster() {
                 openshift.withProject() {
-                  openshift.tag("${targetImage}:test", "${targetImage}:latest") 
+                  openshift.tag(targetImage + ":test", targetImage + ":latest") 
                 }
             }
         }
